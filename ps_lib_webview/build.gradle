@@ -1,0 +1,69 @@
+apply plugin: 'com.android.library'
+//kotlin支持
+//apply plugin: 'kotlin-android'
+//apply plugin: 'kotlin-android-extensions'
+//apply plugin: 'kotlin-kapt'
+apply plugin: 'maven'
+
+android {
+    compileSdkVersion 27
+    buildToolsVersion "28.0.1"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 25
+        versionCode rootProject.ext.versionCode.pslib_jswebview
+        versionName rootProject.ext.versionName.pslib_jswebview
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    api('com.github.alfredxl:localgallery:v1.0.3') {
+        exclude group: 'com.android.support'
+    }
+    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:support-annotations:27.1.1'
+}
+
+uploadArchives {
+    configuration = configurations.archives
+    repositories {
+        mavenDeployer {
+            snapshotRepository(url: MAVEN_REPO_SNAPSHOT_URL) {
+                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
+            }
+            repository(url: MAVEN_REPO_RELEASE_URL) {
+                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
+            }
+            pom.project {
+                version rootProject.ext.versionName.pslib_jswebview
+                artifactId 'pslib-jswebview'
+                groupId GROUP_ID
+                packaging TYPE
+                description DESCRIPTION_WEBVIEW
+            }
+        }
+    }
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+artifacts {
+    archives file('ps_lib_webview.aar')
+    archives androidSourcesJar
+}
